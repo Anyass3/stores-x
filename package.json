@@ -1,0 +1,43 @@
+{
+    "name": "store-x",
+    "version": "0.0.1",
+    "description": "This is minimal vueX implementation.",
+    "svelte": "src/index.js",
+    "jsdelivr": "dist/index.min.js",
+    "module": "dist/index.mjs",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "chmod +x .build && ./.build",
+        "prepublishOnly": "npm run build"
+    },
+    "keywords": [
+        "store",
+        "svelte"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Anyass/store-x.git"
+    },
+    "author": "ME",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Anyass/store-x/issues"
+    },
+    "homepage": "https://github.com/Anyass/store-xE#readme",
+    "devDependencies": {
+        "@babel/cli": "^7.12.1",
+        "@babel/core": "^7.12.3",
+        "@babel/node": "^7.12.1",
+        "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+        "@babel/polyfill": "^7.12.1",
+        "@babel/preset-env": "^7.12.1",
+        "@rollup/plugin-node-resolve": "^9.0.0",
+        "rollup": "^2.0.0",
+        "rollup-plugin-svelte": "^6.0.0",
+        "svelte": "^3.0.0"
+    },
+    "files": [
+        "src",
+        "dist"
+    ]
+}

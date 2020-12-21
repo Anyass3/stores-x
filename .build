@@ -1,0 +1,9 @@
+
+rollup -c
+
+babel dist/index.js --out-file dist/old.index.js
+echo "compiled dist/index.js with babel for old browsers as dist/old.index.js"
+
+terser -c -m -- dist/old.index.js > dist/old.index.min.js
+echo "minified dist/old.index.js > dist/old.index.min.js"
+
