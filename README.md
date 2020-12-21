@@ -92,6 +92,7 @@ export default sveltex([store1,store2])
 ```
 
 now in your svelte components
+
 com1.svelte
 ```svelte
 <script>
