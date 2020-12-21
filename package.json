@@ -1,8 +1,7 @@
 {
     "name": "stores-x",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "This is minimal vueX implementation.",
-    "svelte": "src/index.js",
     "jsdelivr": "dist/index.min.js",
     "module": "dist/index.mjs",
     "main": "dist/index.js",
