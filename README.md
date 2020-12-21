@@ -88,7 +88,7 @@ import svelteX from 'stores-x';
 import store1 from './store1';
 import store2 from './store2';
 
-export default sveltex([store1,store2])
+export default svelteX([store1,store2])
 ```
 
 now in your svelte components
@@ -98,19 +98,25 @@ com1.svelte
 <script>
 	import stores from './stores.js'
 	const {getCameraState, videoIsStreaming} = stores.getters
-	const {streamingVideo, cameraState} = stores.actions
+	const { streamingVideo, cameraState} = stores.actions
   
-	$: cameraState=getCameraState()
+	$: camera=getCameraState()
 	$: streaming=videoIsStreaming()
 </script>
 
-<p>camera is {cameraState}</p>
-<p>video has {videoIsStreaming?'':'NOT'} started streaming</p>
+<p>camera is {$camera}</p>
+<p>video is {$streaming?'':'NOT'} streaming</p>
 
+<div>
+<button on:click={()=>cameraState('on')}>on camera</button>
+<button on:click={()=>cameraState('off')}>off camera</button>
+</div>
 
-<button on:click={()=cameraState('on')}>on camera</button>
-<button on:click={()=cameraState('off')}>off camera</button>
-
-<button on:click={()=streamingVideo(true)}>start streaming</button>
-<button on:click={()=streamingVideo(false)}>start streaming</button>
+<div>
+<button on:click={()=>streamingVideo(true)}>start streaming</button>
+<button on:click={()=>streamingVideo(false)}>stop streaming</button>
+</div>
 ```
+
+
+[check out demo](https://svelte.dev/repl/3916c946d06e4289b28992ea625c5092?version=3.31.0)
