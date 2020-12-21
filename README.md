@@ -7,75 +7,78 @@ It uses the svelte store
 
 It makes working with svelte stores somewhat clean and organised
 
-# Usage
-example:
+Also the compiled version can be used in any other js library
+
+# installation
+`npm install store-x`
+
+Also you can try cdn
+```html
+<script src="https://cdn.jsdelivr.net/npm/store-x/dist/index.min.js"><script>
+```
+
+for old browsers
+```html
+<script src="https://cdn.jsdelivr.net/npm/store-x/dist/old.index.min.js"><script>
+```
+
+
+# Usage 
+example in svelte
+> it will be similar in other js frameworks
 
 store1.js
 ```js
 export default {
 	state: { // each state value is going to a writable svelte store
 		camera: 'off',
-		audio: 'off'
 	},
 	getters: { //
 		getCameraState(state){
 			return state.camera
-		},
-		getAudioState(state){
-			return state.audio
 		},
 	},
 	mutations: {
 		setCameraState(state, val){
 			state.camera.set(val)
 		},
-		setAudioState(state, val){
-			state.audio.set(val)
-		},
 	},
 	actions: {
 		cameraState({commit}, val){
 			commit('setCameraState', val)
 		},
-		AudioState(state, val){
-			state.audio.set(val)
-		}
 	}
 }
 ```
+you may can add other state values, getters etc
+
+
 store2.js
 ```js
 export default {
 	state: {
 		startedVideoStream: false,
-		startedAudioStream: false
 	},
 	getters: {
 		videoIsStreaming(state){
 			return state.startedVideoStream
 		},
-		audioIsStreaming(state){
-			return state.startedAudioStream
-		}
 	},
 	mutations: {
 		setStreamingVideo(state, val){
 			state.startedVideoStream.set(val)
-		},
-		setStreamingAudio(state, val){
-			state.startedAudioStream.set(val)
 		},
 	},
 	actions: {
 		streamingVideo({commit}, val){
 			commit('setStreamingVideo', val)
 		},
-		streamingAudio({commit}, val){
-			commit('setStreamingAudio', val)
-		},
 	}
 }
 ```
+you may can add other state values, getters etc
+
+
 now in the main-store-flie
 
 stores.js
@@ -93,11 +96,20 @@ com1.svelte
 ```svelte
 <script>
 	import stores from './stores.js'
-  const {getCameraState, getAudioState, videoIsStreaming, audioIsStreaming} = stores.getters
-  const {streamingVideo, AudioState, streamingAudio,cameraState} = stores.actions
-  
+	const {getCameraState, videoIsStreaming} = stores.getters
+	const {streamingVideo, cameraState} = stores.actions
   
 	$: cameraState=getCameraState()
-	$: audioState=getAudioState()
+	$: streaming=videoIsStreaming()
 </script>
+
+<p>camera is {cameraState}</p>
+<p>video has {videoIsStreaming?'':'NOT'} started streaming</p>
+
+
+<button on:click={()=cameraState('on')}>on camera</button>
+<button on:click={()=cameraState('off')}>off camera</button>
+
+<button on:click={()=streamingVideo(true)}>start streaming</button>
+<button on:click={()=streamingVideo(false)}>start streaming</button>
 ```
