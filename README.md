@@ -7,7 +7,7 @@ It uses the svelte store
 
 It makes working with svelte stores somewhat clean and organised
 
-Also the compiled version can be used in any other js library
+Also the compiled version can be used in any other js web app
 
 # installation
 `npm install stores-x`
