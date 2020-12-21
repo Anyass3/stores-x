@@ -27,6 +27,9 @@ module
 ```
 
 # Usage 
+
+> [check out the svelte relp demo](https://svelte.dev/repl/3916c946d06e4289b28992ea625c5092?version=3.31.0)
+
 example in svelte
 > it will be similar in other js frameworks
 
@@ -123,4 +126,3 @@ com1.svelte
 ```
 
 
-[check out demo](https://svelte.dev/repl/3916c946d06e4289b28992ea625c5092?version=3.31.0)
