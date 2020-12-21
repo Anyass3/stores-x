@@ -1,4 +1,4 @@
-# svelte-storeX
+# stores-x
 This is inspired by Vuex
 
 It's for now a minimal implementation of the vuex
@@ -10,16 +10,16 @@ It makes working with svelte stores somewhat clean and organised
 Also the compiled version can be used in any other js library
 
 # installation
-`npm install store-x`
+`npm install stores-x`
 
 Also you can try cdn
 ```html
-<script src="https://cdn.jsdelivr.net/npm/store-x/dist/index.min.js"><script>
+<script src="https://cdn.jsdelivr.net/npm/stores-x/dist/index.min.js"><script>
 ```
 
 for old browsers
 ```html
-<script src="https://cdn.jsdelivr.net/npm/store-x/dist/old.index.min.js"><script>
+<script src="https://cdn.jsdelivr.net/npm/stores-x/dist/old.index.min.js"><script>
 ```
 
 
@@ -83,7 +83,7 @@ now in the main-store-flie
 
 stores.js
 ```js
-import svelteX from 'svelteX';
+import svelteX from 'stores-x';
 
 import store1 from './store1';
 import store2 from './store2';
