@@ -7,6 +7,8 @@ const getMutations = (obj, state) => {
   }
   return _obj_;
 };
+
+
 const getActions = (obj, actionObj) => {
   let _obj_;
   for (let item in obj) {
@@ -14,6 +16,8 @@ const getActions = (obj, actionObj) => {
   }
   return _obj_;
 };
+
+
 const getGetters = (obj, state) => {
   let _obj_;
   for (let item in obj) {
@@ -21,6 +25,10 @@ const getGetters = (obj, state) => {
   }
   return _obj_;
 };
+
+
+
+
 export default (mystores) => {
   const stores = (value) =>
     mystores.reduce((st, store) => {
@@ -29,6 +37,7 @@ export default (mystores) => {
 
   let storeState = stores("state");
   for (let item in storeState) storeState[item] = writable(storeState[item]);
+  
   const store = writable(storeState);
   let _store_;
   store.subscribe((value) => {
@@ -44,6 +53,7 @@ export default (mystores) => {
         mutations[mutation](val);
       },
     });
+    
   return {
     subscribe: store.subscribe,
     set: store.set,
