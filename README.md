@@ -1,4 +1,4 @@
-# svelteX
+# svelte-storeX
 This is inspired by Vuex
 
 It's for now a minimal implementation of the vuex
