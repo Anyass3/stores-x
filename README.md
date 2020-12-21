@@ -12,7 +12,7 @@ Also the compiled version can be used in any other js library
 # installation
 `npm install stores-x`
 
-Also you can try cdn
+# Also you can try cdn
 ```html
 <script src="https://cdn.jsdelivr.net/npm/stores-x/dist/index.min.js"><script>
 ```
@@ -21,7 +21,10 @@ for old browsers
 ```html
 <script src="https://cdn.jsdelivr.net/npm/stores-x/dist/old.index.min.js"><script>
 ```
-
+module
+```html
+<script src="https://cdn.jsdelivr.net/npm/stores-x/dist/index.min.mjs"><script>
+```
 
 # Usage 
 example in svelte
@@ -58,6 +61,7 @@ store2.js
 export default {
 	state: {
 		startedVideoStream: false,
+		other: value
 	},
 	getters: {
 		videoIsStreaming(state){
