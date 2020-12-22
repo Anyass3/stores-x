@@ -107,8 +107,8 @@ com1.svelte
 	const {getCameraState, videoIsStreaming} = stores.getters
 	const { streamingVideo, cameraState} = stores.actions
   
-	$: camera=getCameraState()
-	$: streaming=videoIsStreaming()
+	const camera=getCameraState()
+	const streaming=videoIsStreaming()
 </script>
 
 <p>camera is {$camera}</p>
