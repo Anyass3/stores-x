@@ -1,65 +1,54 @@
-import { writable } from "svelte/store";
+import { writable, readable } from 'svelte/store';
+import {
+  Getters,
+  Mutations,
+  Actions,
+  getGetters,
+  getMutations,
+  getActions,
+  Dispatcher,
+} from './utils';
 
-const getMutations = (obj, state) => {
-  let _obj_;
-  for (let item in obj) {
-    _obj_ = { ..._obj_, [item]: (arg) => obj[item](state, arg) };
-  }
-  return _obj_;
-};
-
-
-const getActions = (obj, actionObj) => {
-  let _obj_;
-  for (let item in obj) {
-    _obj_ = { ..._obj_, [item]: (arg) => obj[item](actionObj, arg) };
-  }
-  return _obj_;
-};
-
-
-const getGetters = (obj, state) => {
-  let _obj_;
-  for (let item in obj) {
-    _obj_ = { ..._obj_, [item]: () => obj[item](state) };
-  }
-  return _obj_;
-};
-
-
-
-
-export default (mystores) => {
+export default (mystores, prefix = {}) => {
   const stores = (value) =>
     mystores.reduce((st, store) => {
       return { ...st, ...store[value] };
     }, {});
 
-  let storeState = stores("state");
+  let storeState = stores('state');
   for (let item in storeState) storeState[item] = writable(storeState[item]);
-  
-  const store = writable(storeState);
+
+  const store = readable(storeState);
   let _store_;
   store.subscribe((value) => {
     _store_ = value;
+    !!_store_['defaults'] ? (_store_['defaults'] = false) : '';
   })();
 
-  const mutations = getMutations(stores("mutations"), _store_),
-    actions = getActions(stores("actions"), {
-      dispatch(action) {
-        (actions[action] || mutations[action])();
-      },
-      commit(mutation, val) {
-        mutations[mutation](val);
-      },
-    });
-    
+  const mutations = {
+    ...Mutations(_store_, prefix.mutation, mystores),
+    ...getMutations(stores('mutations'), _store_),
+  };
+
+  const { actions, commit, dispatch } = getActions(
+    { ...Actions(mutations, prefix.action), ...stores('actions') },
+    {
+      dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
+      commit: (mutation, ...args) => mutations[mutation](...args),
+      state: _store_,
+    }
+  );
+
   return {
+    state: _store_,
     subscribe: store.subscribe,
-    set: store.set,
-    update: store.update,
     mutations,
     actions,
-    getters: getGetters(stores("getters"), _store_),
+    getters: {
+      ...Getters(_store_, prefix.getter, mystores),
+      ...getGetters(stores('getters'), _store_),
+    },
+    dispatch,
+    commit,
   };
 };
