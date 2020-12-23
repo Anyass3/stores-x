@@ -220,11 +220,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     var item = stores.find(function (item) {
       return Object.keys(item.state).includes(state);
     });
-    var config = item ? item.defaults !== undefined ? item.defaults : true : true; // 	console.log(state, item.defaults, config)
-
-    var hmm = typeof config === 'boolean' ? config : _typeof(config) === 'object' ? _typeof(config[state]) === 'object' ? config[state][type] !== undefined ? config[state][type] : true : config[state] !== undefined ? config[state] : true : true;
-    console.log(state, type, hmm);
-    return hmm;
+    var config = item ? item.defaults !== undefined ? item.defaults : true : true;
+    return typeof config === 'boolean' ? config : _typeof(config) === 'object' ? _typeof(config[state]) === 'object' ? config[state][type] !== undefined ? config[state][type] : true : config[state] !== undefined ? config[state] : true : true;
   };
 
   var Dispatcher = function Dispatcher(actions, action) {

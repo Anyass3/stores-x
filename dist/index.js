@@ -117,21 +117,17 @@
     const checkDefault = (stores, state, type) => {
       const item = stores.find((item) => Object.keys(item.state).includes(state));
       const config = item ? (item.defaults !== undefined ? item.defaults : true) : true;
-      // 	console.log(state, item.defaults, config)
-      const hmm =
-        typeof config === 'boolean'
-          ? config
-          : typeof config === 'object'
-          ? typeof config[state] === 'object'
-            ? config[state][type] !== undefined
-              ? config[state][type]
-              : true
-            : config[state] !== undefined
-            ? config[state]
+      return typeof config === 'boolean'
+        ? config
+        : typeof config === 'object'
+        ? typeof config[state] === 'object'
+          ? config[state][type] !== undefined
+            ? config[state][type]
             : true
-          : true;
-      console.log(state, type, hmm);
-      return hmm;
+          : config[state] !== undefined
+          ? config[state]
+          : true
+        : true;
     };
 
     const Dispatcher = (actions, action, ...args) => {
