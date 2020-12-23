@@ -22,7 +22,6 @@ export default (mystores, prefix = {}) => {
   let _store_;
   store.subscribe((value) => {
     _store_ = value;
-    !!_store_['defaults'] ? (_store_['defaults'] = false) : '';
   })();
 
   const mutations = {
