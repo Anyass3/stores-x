@@ -1,6 +1,6 @@
 {
     "name": "stores-x",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "description": "This is minimal vueX implementation.",
     "jsdelivr": "dist/index.min.js",
     "module": "dist/index.mjs",
@@ -15,14 +15,14 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Anyass/stores-x.git"
+        "url": "git+https://github.com/Anyass3/stores-x.git"
     },
-    "author": "ME",
+    "author": "Abdoulie Nyass",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/Anyass/stores-x/issues"
+        "url": "https://github.com/Anyass3/stores-x/issues"
     },
-    "homepage": "https://github.com/Anyass/stores-xE#readme",
+    "homepage": "https://github.com/Anyass3/stores-xE#readme",
     "devDependencies": {
         "@babel/cli": "^7.12.1",
         "@babel/core": "^7.12.3",

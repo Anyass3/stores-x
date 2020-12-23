@@ -3,14 +3,15 @@ const getName = (prefix, str) => prefix + str.slice(0, 1).toUpperCase() + str.sl
 export const Getters = (state, prefix = 'get', stores) => {
   let obj = {};
   for (let item in state)
-    if (checkDefault(stores, item)) obj[getName(prefix, item)] = () => state[item];
+    if (checkDefault(stores, item, 'getters')) obj[getName(prefix, item)] = () => state[item];
   return obj;
 };
 
 export const Mutations = (state, prefix = 'set', stores) => {
   let obj = {};
   for (let item in state)
-    if (checkDefault(stores, item)) obj[getName(prefix, item)] = (val) => state[item]['set'](val);
+    if (checkDefault(stores, item, 'mutations'))
+      obj[getName(prefix, item)] = (val) => state[item]['set'](val);
   return obj;
 };
 
@@ -40,14 +41,24 @@ export const getGetters = (obj, state) => {
   return _obj_;
 };
 
-const checkDefault = (stores, state) => {
+const checkDefault = (stores, state, type) => {
   const item = stores.find((item) => Object.keys(item.state).includes(state));
   const config = item ? (item.defaults !== undefined ? item.defaults : true) : true;
-  return typeof config === 'boolean'
-    ? config
-    : typeof config === 'object'
-    ? !!config[state]
-    : false;
+  // 	console.log(state, item.defaults, config)
+  const hmm =
+    typeof config === 'boolean'
+      ? config
+      : typeof config === 'object'
+      ? typeof config[state] === 'object'
+        ? config[state][type] !== undefined
+          ? config[state][type]
+          : true
+        : config[state] !== undefined
+        ? config[state]
+        : true
+      : true;
+  console.log(state, type, hmm);
+  return hmm;
 };
 
 export const Dispatcher = (actions, action, ...args) => {
