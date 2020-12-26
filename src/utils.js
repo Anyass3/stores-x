@@ -37,7 +37,7 @@ export const getActions = (obj, actionObj) => {
 
 export const getGetters = (obj, state) => {
   let _obj_;
-  for (let item in obj) _obj_ = { ..._obj_, [item]: () => obj[item](state) };
+  for (let item in obj) _obj_ = { ..._obj_, [item]: (...args) => obj[item](state, ...args) };
   return _obj_;
 };
 
@@ -60,8 +60,8 @@ const checkDefault = (stores, state, type) => {
 export const Dispatcher = (actions, action, ...args) => {
   return new Promise((resolve, reject) => {
     try {
-      typeof action === 'function' ? action(...args) : actions[action](...args);
-      resolve('OK');
+      let result = typeof action === 'function' ? action(...args) : actions[action](...args);
+      resolve(result ? result : 'OK');
     } catch (err) {
       reject(err);
     }

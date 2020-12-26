@@ -24,6 +24,11 @@ export default (mystores, prefix = {}) => {
     _store_ = value;
   })();
 
+  const getters = {
+    ...Getters(_store_, prefix.getter, mystores),
+    ...getGetters(stores('getters'), _store_),
+  };
+
   const mutations = {
     ...Mutations(_store_, prefix.mutation, mystores),
     ...getMutations(stores('mutations'), _store_),
@@ -35,6 +40,7 @@ export default (mystores, prefix = {}) => {
       dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
       commit: (mutation, ...args) => mutations[mutation](...args),
       state: _store_,
+      g: (getter, ...args) => getters[getter](...args),
     }
   );
 
@@ -43,10 +49,7 @@ export default (mystores, prefix = {}) => {
     subscribe: store.subscribe,
     mutations,
     actions,
-    getters: {
-      ...Getters(_store_, prefix.getter, mystores),
-      ...getGetters(stores('getters'), _store_),
-    },
+    getters,
     dispatch,
     commit,
   };

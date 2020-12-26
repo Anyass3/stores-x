@@ -110,7 +110,7 @@
 
     const getGetters = (obj, state) => {
       let _obj_;
-      for (let item in obj) _obj_ = { ..._obj_, [item]: () => obj[item](state) };
+      for (let item in obj) _obj_ = { ..._obj_, [item]: (...args) => obj[item](state, ...args) };
       return _obj_;
     };
 
@@ -133,8 +133,8 @@
     const Dispatcher = (actions, action, ...args) => {
       return new Promise((resolve, reject) => {
         try {
-          typeof action === 'function' ? action(...args) : actions[action](...args);
-          resolve('OK');
+          let result = typeof action === 'function' ? action(...args) : actions[action](...args);
+          resolve(result ? result : 'OK');
         } catch (err) {
           reject(err);
         }
@@ -156,6 +156,11 @@
         _store_ = value;
       })();
 
+      const getters = {
+        ...Getters(_store_, prefix.getter, mystores),
+        ...getGetters(stores('getters'), _store_),
+      };
+
       const mutations = {
         ...Mutations(_store_, prefix.mutation, mystores),
         ...getMutations(stores('mutations'), _store_),
@@ -167,6 +172,7 @@
           dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
           commit: (mutation, ...args) => mutations[mutation](...args),
           state: _store_,
+          g: (getter, ...args) => getters[getter](...args),
         }
       );
 
@@ -175,10 +181,7 @@
         subscribe: store.subscribe,
         mutations,
         actions,
-        getters: {
-          ...Getters(_store_, prefix.getter, mystores),
-          ...getGetters(stores('getters'), _store_),
-        },
+        getters,
         dispatch,
         commit,
       };

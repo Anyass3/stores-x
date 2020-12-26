@@ -205,7 +205,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     var _loop6 = function _loop6(item) {
       _obj_ = Object.assign({}, _obj_, _defineProperty({}, item, function () {
-        return obj[item](state);
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+
+        return obj[item].apply(obj, [state].concat(args));
       }));
     };
 
@@ -225,14 +229,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   };
 
   var Dispatcher = function Dispatcher(actions, action) {
-    for (var _len3 = arguments.length, args = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-      args[_key3 - 2] = arguments[_key3];
+    for (var _len4 = arguments.length, args = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+      args[_key4 - 2] = arguments[_key4];
     }
 
     return new Promise(function (resolve, reject) {
       try {
-        typeof action === 'function' ? action.apply(void 0, args) : actions[action].apply(actions, args);
-        resolve('OK');
+        var result = typeof action === 'function' ? action.apply(void 0, args) : actions[action].apply(actions, args);
+        resolve(result ? result : 'OK');
       } catch (err) {
         reject(err);
       }
@@ -261,24 +265,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     store.subscribe(function (value) {
       _store_ = value;
     })();
+    var getters = Object.assign({}, Getters(_store_, prefix.getter, mystores), getGetters(stores('getters'), _store_));
     var mutations = Object.assign({}, Mutations(_store_, prefix.mutation, mystores), getMutations(stores('mutations'), _store_));
 
     var _getActions = getActions(Object.assign({}, Actions(mutations, prefix.action), stores('actions')), {
       dispatch: function dispatch(action) {
-        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-          args[_key4 - 1] = arguments[_key4];
+        for (var _len5 = arguments.length, args = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+          args[_key5 - 1] = arguments[_key5];
         }
 
         return Dispatcher.apply(void 0, [actions, action].concat(args));
       },
       commit: function commit(mutation) {
-        for (var _len5 = arguments.length, args = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-          args[_key5 - 1] = arguments[_key5];
+        for (var _len6 = arguments.length, args = new Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+          args[_key6 - 1] = arguments[_key6];
         }
 
         return mutations[mutation].apply(mutations, args);
       },
-      state: _store_
+      state: _store_,
+      g: function g(getter) {
+        for (var _len7 = arguments.length, args = new Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+          args[_key7 - 1] = arguments[_key7];
+        }
+
+        return getters[getter].apply(getters, args);
+      }
     }),
         actions = _getActions.actions,
         commit = _getActions.commit,
@@ -289,7 +301,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       subscribe: store.subscribe,
       mutations: mutations,
       actions: actions,
-      getters: Object.assign({}, Getters(_store_, prefix.getter, mystores), getGetters(stores('getters'), _store_)),
+      getters: getters,
       dispatch: dispatch,
       commit: commit
     };
