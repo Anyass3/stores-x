@@ -1,5 +1,17 @@
 "use strict";
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17,22 +29,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var subscriber_queue = [];
   /**
-   * Creates a `Readable` store that allows reading by subscription.
-   * @param value initial value
-   * @param {StartStopNotifier}start start and stop notifications for subscriptions
-   */
-
-  function readable(value, start) {
-    return {
-      subscribe: writable(value, start).subscribe
-    };
-  }
-  /**
    * Create a `Writable` store that allows both updating and reading by subscription.
    * @param {*=}value initial value
    * @param {StartStopNotifier=}start start and stop notifications for subscriptions
    */
-
 
   function writable(value) {
     var start = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
@@ -252,21 +252,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }, {});
     };
 
+    var noStore = mystores.reduce(function (st, store) {
+      return [].concat(_toConsumableArray(st), _toConsumableArray(store['noStore'] ? store['noStore'] : []));
+    }, []);
     var storeState = stores('state');
 
     for (var item in storeState) {
-      storeState[item] = writable(storeState[item]);
+      storeState[item] = noStore.includes(item) ? storeState[item] : writable(storeState[item]);
     }
 
-    var store = readable(storeState);
+    var store = writable(storeState);
 
     var _store_;
 
     store.subscribe(function (value) {
       _store_ = value;
     })();
-    var getters = Object.assign({}, Getters(_store_, prefix.getter, mystores), getGetters(stores('getters'), _store_));
     var mutations = Object.assign({}, Mutations(_store_, prefix.mutation, mystores), getMutations(stores('mutations'), _store_));
+    var getters = Object.assign({}, Getters(_store_, prefix.getter, mystores), getGetters(stores('getters'), _store_));
 
     var _getActions = getActions(Object.assign({}, Actions(mutations, prefix.action), stores('actions')), {
       dispatch: function dispatch(action) {

@@ -11,16 +11,6 @@
 
     const subscriber_queue = [];
     /**
-     * Creates a `Readable` store that allows reading by subscription.
-     * @param value initial value
-     * @param {StartStopNotifier}start start and stop notifications for subscriptions
-     */
-    function readable(value, start) {
-        return {
-            subscribe: writable(value, start).subscribe
-        };
-    }
-    /**
      * Create a `Writable` store that allows both updating and reading by subscription.
      * @param {*=}value initial value
      * @param {StartStopNotifier=}start start and stop notifications for subscriptions
@@ -146,24 +136,28 @@
         mystores.reduce((st, store) => {
           return { ...st, ...store[value] };
         }, {});
-
+      const noStore = mystores.reduce((st, store) => {
+        return [...st, ...(store['noStore'] ? store['noStore'] : [])];
+      }, []);
       let storeState = stores('state');
-      for (let item in storeState) storeState[item] = writable(storeState[item]);
+      for (let item in storeState) {
+        storeState[item] = noStore.includes(item) ? storeState[item] : writable(storeState[item]);
+      }
 
-      const store = readable(storeState);
+      const store = writable(storeState);
       let _store_;
       store.subscribe((value) => {
         _store_ = value;
       })();
 
-      const getters = {
-        ...Getters(_store_, prefix.getter, mystores),
-        ...getGetters(stores('getters'), _store_),
-      };
-
       const mutations = {
         ...Mutations(_store_, prefix.mutation, mystores),
         ...getMutations(stores('mutations'), _store_),
+      };
+
+      const getters = {
+        ...Getters(_store_, prefix.getter, mystores),
+        ...getGetters(stores('getters'), _store_),
       };
 
       const { actions, commit, dispatch } = getActions(
