@@ -8,7 +8,7 @@ It uses the svelte store
 
 It makes working with svelte stores somewhat clean and organised
 
-Also the compiled version can be used in any other js web app
+Also the compiled version should be able to work in any other js web app(not tested yet)
 
 # installation
 
@@ -36,4 +36,8 @@ module
 
 > [check out the svelte relp demo](https://svelte.dev/repl/3916c946d06e4289b28992ea625c5092?version=3.31.0)
 
-> it will be similar in other js frameworks
+> it should be similar in other js frameworks(not tested yet)
+
+# API
+
+
