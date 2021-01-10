@@ -61,7 +61,7 @@ export const Dispatcher = (actions, action, ...args) => {
   return new Promise((resolve, reject) => {
     try {
       let result = typeof action === 'function' ? action(...args) : actions[action](...args);
-      resolve(result ? result : 'OK');
+      resolve(result);
     } catch (err) {
       reject(err);
     }

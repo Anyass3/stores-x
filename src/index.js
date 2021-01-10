@@ -37,6 +37,7 @@ export default (mystores, prefix = {}) => {
     ...Getters(_store_, prefix.getter, mystores),
     ...getGetters(stores('getters'), _store_),
   };
+  const g = (getter, ...args) => getters[getter](...args); //gets Getters
 
   const { actions, commit, dispatch } = getActions(
     { ...Actions(mutations, prefix.action), ...stores('actions') },
@@ -44,7 +45,7 @@ export default (mystores, prefix = {}) => {
       dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
       commit: (mutation, ...args) => mutations[mutation](...args),
       state: _store_,
-      g: (getter, ...args) => getters[getter](...args),
+      g,
     }
   );
 
@@ -56,5 +57,6 @@ export default (mystores, prefix = {}) => {
     getters,
     dispatch,
     commit,
+    g,
   };
 };

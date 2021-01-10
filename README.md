@@ -1,6 +1,6 @@
 # stores-x
 
-This is inspired by Vuex
+This is inspired by [Vuex](https://github.com/vuejs/vuex)
 
 It's for now a minimal implementation of the vuex
 
@@ -40,4 +40,102 @@ module
 
 # API
 
+##### store.state => each individual state defaults as a **writable svelte store**
 
+##### store.mutations => They mutate the state values. Simply put they change or set state values. The are funtions.
+
+declared like This :
+
+```javascript
+mutationName(state,...args){}
+```
+
+run as
+
+```javascript
+commit('mutationName', val);
+or;
+mutationName(val);
+```
+
+##### store.actions => The do tasks like any other function. They can **commit** 'store.mutations' also can **dispatch** store.actions.
+
+declared like This :
+
+```javascript
+actionName({state, commit, dispatch, g },...args){}
+```
+
+run as
+
+```javascript
+dispatch('actionName', ...args);
+or;
+actionName(...args);
+```
+
+##### store.getters => They are used to get state values or any other custom one
+
+declared like This :
+
+```javascript
+getterName(state,...args:Optional){}
+```
+
+run as
+
+```javascript
+g('getterName');
+or;
+getterName();
+```
+
+##### store.noStore => this an array of state you don't wish to be a **writable svelte store**. **It's just a config**
+
+##### store.defaults => This controls the default settings (ie. whether to disable the default getter or mutation for a particular state). **It's just a config**
+
+        if the default mutation for a particular state is disabled the corresponding default action will also be disabled.
+
+##### commit => executes/runs a mutation and might return anything
+
+like:
+
+```javascript
+commit('mutationName', val);
+```
+
+##### dispatch => executes/runs an action and returns Promise
+
+like:
+
+```javascript
+dispatch('mutationName', ...args);
+```
+
+# Example
+
+```javascript
+store = {
+  state: {
+    isLogedIn: false,
+  },
+  getters: {
+    getIslogedIn(state) {
+      // this will be created be default unless disabled
+      return state.isLogedIn;
+    },
+  },
+  mutations: {
+    setIsLogedIn(state, val) {
+      // this will be created be default unless disabled
+      state.isLogedIn.set(val);
+    },
+  },
+  actions: {
+    setIsLogedIn({ state, commit, dispatch, g }, val) {
+      // this will be created be default unless disabled
+      commit('setIsLogedIn', val);
+    },
+  },
+};
+```
