@@ -1,8 +1,9 @@
-import { writable } from 'svelte/store';
+import { Writable } from './custom-store';
+
 import {
-  Getters,
-  Mutations,
-  Actions,
+  createDefaultGetters,
+  createDefaultMutations,
+  createDefaultActions,
   getGetters,
   getMutations,
   getActions,
@@ -11,46 +12,46 @@ import {
 
 export default (mystores, prefix = {}) => {
   const stores = (value) =>
-    mystores.reduce((st, store) => {
-      return { ...st, ...store[value] };
+    mystores.reduce((arr, store) => {
+      return { ...arr, ...store[value] };
     }, {});
-  const noStore = mystores.reduce((st, store) => {
-    return [...st, ...(store['noStore'] ? store['noStore'] : [])];
+  const noStore = mystores.reduce((arr, store) => {
+    return [...arr, ...(store['noStore'] ? store['noStore'] : [])];
   }, []);
   let storeState = stores('state');
   for (let item in storeState) {
-    storeState[item] = noStore.includes(item) ? storeState[item] : writable(storeState[item]);
+    storeState[item] = noStore.includes(item) ? storeState[item] : Writable(storeState[item]);
   }
 
-  const store = writable(storeState);
-  let _store_;
-  store.subscribe((value) => {
-    _store_ = value;
-  })();
+  const store = Writable(storeState);
+
+  let State = store.get();
 
   const mutations = {
-    ...Mutations(_store_, prefix.mutation, mystores),
-    ...getMutations(stores('mutations'), _store_),
+    ...createDefaultMutations(State, prefix.mutation, mystores, noStore),
+    ...getMutations(stores('mutations'), State),
   };
 
   const getters = {
-    ...Getters(_store_, prefix.getter, mystores),
-    ...getGetters(stores('getters'), _store_),
+    ...createDefaultGetters(State, prefix.getter, mystores),
+    ...getGetters(stores('getters'), State),
   };
-  const g = (getter, ...args) => getters[getter](...args); //gets Getters
+  const g = (getter, ...args) => getters[getter](...args); //gets getters
 
   const { actions, commit, dispatch } = getActions(
-    { ...Actions(mutations, prefix.action), ...stores('actions') },
+    { ...createDefaultActions(mutations, prefix.action), ...stores('actions') },
     {
       dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
       commit: (mutation, ...args) => mutations[mutation](...args),
-      state: _store_,
+      state: State,
       g,
     }
   );
 
   return {
-    state: _store_,
+    get state() {
+      return store.get();
+    },
     subscribe: store.subscribe,
     mutations,
     actions,

@@ -1,21 +1,22 @@
 const getName = (prefix, str) => prefix + str.slice(0, 1).toUpperCase() + str.slice(1);
 
-export const Getters = (state, prefix = 'get', stores) => {
+export const createDefaultGetters = (state, prefix = 'get', stores) => {
   let obj = {};
   for (let item in state)
     if (checkDefault(stores, item, 'getters')) obj[getName(prefix, item)] = () => state[item];
   return obj;
 };
 
-export const Mutations = (state, prefix = 'set', stores) => {
+export const createDefaultMutations = (state, prefix = 'set', stores, noStore) => {
   let obj = {};
   for (let item in state)
     if (checkDefault(stores, item, 'mutations'))
-      obj[getName(prefix, item)] = (val) => state[item]['set'](val);
+      obj[getName(prefix, item)] = (val) =>
+        noStore.includes(item) ? (state[item] = val) : state[item]['set'](val);
   return obj;
 };
 
-export const Actions = (mutations, prefix) => {
+export const createDefaultActions = (mutations, prefix) => {
   let obj = {};
   for (let item in mutations) {
     obj[prefix ? getName(prefix, item) : item] = ({ commit }, val) => commit(item, val);

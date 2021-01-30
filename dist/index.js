@@ -61,24 +61,44 @@
         return { set, update, subscribe };
     }
 
+    const Writable = (value) => {
+      const { subscribe, ...methods } = writable(value);
+
+      const get = () => {
+        let value;
+        subscribe((val) => {
+          value = val;
+        })();
+
+        return value;
+      };
+
+      return {
+        subscribe,
+        ...methods,
+        get,
+      };
+    };
+
     const getName = (prefix, str) => prefix + str.slice(0, 1).toUpperCase() + str.slice(1);
 
-    const Getters = (state, prefix = 'get', stores) => {
+    const createDefaultGetters = (state, prefix = 'get', stores) => {
       let obj = {};
       for (let item in state)
         if (checkDefault(stores, item, 'getters')) obj[getName(prefix, item)] = () => state[item];
       return obj;
     };
 
-    const Mutations = (state, prefix = 'set', stores) => {
+    const createDefaultMutations = (state, prefix = 'set', stores, noStore) => {
       let obj = {};
       for (let item in state)
         if (checkDefault(stores, item, 'mutations'))
-          obj[getName(prefix, item)] = (val) => state[item]['set'](val);
+          obj[getName(prefix, item)] = (val) =>
+            noStore.includes(item) ? (state[item] = val) : state[item]['set'](val);
       return obj;
     };
 
-    const Actions = (mutations, prefix) => {
+    const createDefaultActions = (mutations, prefix) => {
       let obj = {};
       for (let item in mutations) {
         obj[prefix ? getName(prefix, item) : item] = ({ commit }, val) => commit(item, val);
@@ -124,7 +144,7 @@
       return new Promise((resolve, reject) => {
         try {
           let result = typeof action === 'function' ? action(...args) : actions[action](...args);
-          resolve(result ? result : 'OK');
+          resolve(result);
         } catch (err) {
           reject(err);
         }
@@ -133,51 +153,53 @@
 
     var index = (mystores, prefix = {}) => {
       const stores = (value) =>
-        mystores.reduce((st, store) => {
-          return { ...st, ...store[value] };
+        mystores.reduce((arr, store) => {
+          return { ...arr, ...store[value] };
         }, {});
-      const noStore = mystores.reduce((st, store) => {
-        return [...st, ...(store['noStore'] ? store['noStore'] : [])];
+      const noStore = mystores.reduce((arr, store) => {
+        return [...arr, ...(store['noStore'] ? store['noStore'] : [])];
       }, []);
       let storeState = stores('state');
       for (let item in storeState) {
-        storeState[item] = noStore.includes(item) ? storeState[item] : writable(storeState[item]);
+        storeState[item] = noStore.includes(item) ? storeState[item] : Writable(storeState[item]);
       }
 
-      const store = writable(storeState);
-      let _store_;
-      store.subscribe((value) => {
-        _store_ = value;
-      })();
+      const store = Writable(storeState);
+
+      let State = store.get();
 
       const mutations = {
-        ...Mutations(_store_, prefix.mutation, mystores),
-        ...getMutations(stores('mutations'), _store_),
+        ...createDefaultMutations(State, prefix.mutation, mystores, noStore),
+        ...getMutations(stores('mutations'), State),
       };
 
       const getters = {
-        ...Getters(_store_, prefix.getter, mystores),
-        ...getGetters(stores('getters'), _store_),
+        ...createDefaultGetters(State, prefix.getter, mystores),
+        ...getGetters(stores('getters'), State),
       };
+      const g = (getter, ...args) => getters[getter](...args); //gets getters
 
       const { actions, commit, dispatch } = getActions(
-        { ...Actions(mutations, prefix.action), ...stores('actions') },
+        { ...createDefaultActions(mutations, prefix.action), ...stores('actions') },
         {
           dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
           commit: (mutation, ...args) => mutations[mutation](...args),
-          state: _store_,
-          g: (getter, ...args) => getters[getter](...args),
+          state: State,
+          g,
         }
       );
 
       return {
-        state: _store_,
+        get state() {
+          return store.get();
+        },
         subscribe: store.subscribe,
         mutations,
         actions,
         getters,
         dispatch,
         commit,
+        g,
       };
     };
 

@@ -14,6 +14,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 (function (global, factory) {
@@ -99,11 +103,31 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     };
   }
 
+  var Writable = function Writable(value) {
+    var _writable = writable(value),
+        subscribe = _writable.subscribe,
+        methods = _objectWithoutProperties(_writable, ["subscribe"]);
+
+    var get = function get() {
+      var value;
+      subscribe(function (val) {
+        value = val;
+      })();
+      return value;
+    };
+
+    return Object.assign({
+      subscribe: subscribe
+    }, methods, {
+      get: get
+    });
+  };
+
   var getName = function getName(prefix, str) {
     return prefix + str.slice(0, 1).toUpperCase() + str.slice(1);
   };
 
-  var Getters = function Getters(state) {
+  var createDefaultGetters = function createDefaultGetters(state) {
     var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'get';
     var stores = arguments.length > 2 ? arguments[2] : undefined;
     var obj = {};
@@ -121,14 +145,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     return obj;
   };
 
-  var Mutations = function Mutations(state) {
+  var createDefaultMutations = function createDefaultMutations(state) {
     var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'set';
     var stores = arguments.length > 2 ? arguments[2] : undefined;
+    var noStore = arguments.length > 3 ? arguments[3] : undefined;
     var obj = {};
 
     var _loop2 = function _loop2(item) {
       if (checkDefault(stores, item, 'mutations')) obj[getName(prefix, item)] = function (val) {
-        return state[item]['set'](val);
+        return noStore.includes(item) ? state[item] = val : state[item]['set'](val);
       };
     };
 
@@ -139,7 +164,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     return obj;
   };
 
-  var Actions = function Actions(mutations, prefix) {
+  var createDefaultActions = function createDefaultActions(mutations, prefix) {
     var obj = {};
 
     var _loop3 = function _loop3(item) {
@@ -236,7 +261,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     return new Promise(function (resolve, reject) {
       try {
         var result = typeof action === 'function' ? action.apply(void 0, args) : actions[action].apply(actions, args);
-        resolve(result ? result : 'OK');
+        resolve(result);
       } catch (err) {
         reject(err);
       }
@@ -247,66 +272,68 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var stores = function stores(value) {
-      return mystores.reduce(function (st, store) {
-        return Object.assign({}, st, store[value]);
+      return mystores.reduce(function (arr, store) {
+        return Object.assign({}, arr, store[value]);
       }, {});
     };
 
-    var noStore = mystores.reduce(function (st, store) {
-      return [].concat(_toConsumableArray(st), _toConsumableArray(store['noStore'] ? store['noStore'] : []));
+    var noStore = mystores.reduce(function (arr, store) {
+      return [].concat(_toConsumableArray(arr), _toConsumableArray(store['noStore'] ? store['noStore'] : []));
     }, []);
     var storeState = stores('state');
 
     for (var item in storeState) {
-      storeState[item] = noStore.includes(item) ? storeState[item] : writable(storeState[item]);
+      storeState[item] = noStore.includes(item) ? storeState[item] : Writable(storeState[item]);
     }
 
-    var store = writable(storeState);
+    var store = Writable(storeState);
+    var State = store.get();
+    var mutations = Object.assign({}, createDefaultMutations(State, prefix.mutation, mystores, noStore), getMutations(stores('mutations'), State));
+    var getters = Object.assign({}, createDefaultGetters(State, prefix.getter, mystores), getGetters(stores('getters'), State));
 
-    var _store_;
+    var g = function g(getter) {
+      for (var _len5 = arguments.length, args = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+        args[_key5 - 1] = arguments[_key5];
+      }
 
-    store.subscribe(function (value) {
-      _store_ = value;
-    })();
-    var mutations = Object.assign({}, Mutations(_store_, prefix.mutation, mystores), getMutations(stores('mutations'), _store_));
-    var getters = Object.assign({}, Getters(_store_, prefix.getter, mystores), getGetters(stores('getters'), _store_));
+      return getters[getter].apply(getters, args);
+    }; //gets getters
 
-    var _getActions = getActions(Object.assign({}, Actions(mutations, prefix.action), stores('actions')), {
+
+    var _getActions = getActions(Object.assign({}, createDefaultActions(mutations, prefix.action), stores('actions')), {
       dispatch: function dispatch(action) {
-        for (var _len5 = arguments.length, args = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-          args[_key5 - 1] = arguments[_key5];
+        for (var _len6 = arguments.length, args = new Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+          args[_key6 - 1] = arguments[_key6];
         }
 
         return Dispatcher.apply(void 0, [actions, action].concat(args));
       },
       commit: function commit(mutation) {
-        for (var _len6 = arguments.length, args = new Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
-          args[_key6 - 1] = arguments[_key6];
-        }
-
-        return mutations[mutation].apply(mutations, args);
-      },
-      state: _store_,
-      g: function g(getter) {
         for (var _len7 = arguments.length, args = new Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
           args[_key7 - 1] = arguments[_key7];
         }
 
-        return getters[getter].apply(getters, args);
-      }
+        return mutations[mutation].apply(mutations, args);
+      },
+      state: State,
+      g: g
     }),
         actions = _getActions.actions,
         commit = _getActions.commit,
         dispatch = _getActions.dispatch;
 
     return {
-      state: _store_,
+      get state() {
+        return store.get();
+      },
+
       subscribe: store.subscribe,
       mutations: mutations,
       actions: actions,
       getters: getters,
       dispatch: dispatch,
-      commit: commit
+      commit: commit,
+      g: g
     };
   };
 

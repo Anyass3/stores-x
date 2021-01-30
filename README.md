@@ -40,7 +40,9 @@ module
 
 # API
 
-##### store.state => each individual state defaults as a **writable svelte store**
+##### store.state => each individual state defaults as a **writable svelte store** but with an additional `get` property to get the current state value.
+
+example: `store.get()` // gets current value by making a temporal store subscription
 
 ##### store.mutations => They mutate the state values. Simply put they change or set state values. The are funtions.
 
