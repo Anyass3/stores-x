@@ -23,18 +23,14 @@ export default (mystores, prefix = {}) => {
     storeState[item] = noStore.includes(item) ? storeState[item] : Writable(storeState[item]);
   }
 
-  const store = Writable(storeState);
-
-  let State = store.get();
-
   const mutations = {
-    ...createDefaultMutations(State, prefix.mutation, mystores, noStore),
-    ...getMutations(stores('mutations'), State),
+    ...createDefaultMutations(storeState, prefix.mutation, mystores, noStore),
+    ...getMutations(stores('mutations'), storeState),
   };
 
   const getters = {
-    ...createDefaultGetters(State, prefix.getter, mystores),
-    ...getGetters(stores('getters'), State),
+    ...createDefaultGetters(storeState, prefix.getter, mystores),
+    ...getGetters(stores('getters'), storeState),
   };
   const g = (getter, ...args) => getters[getter](...args); //gets getters
 
@@ -43,16 +39,13 @@ export default (mystores, prefix = {}) => {
     {
       dispatch: (action, ...args) => Dispatcher(actions, action, ...args),
       commit: (mutation, ...args) => mutations[mutation](...args),
-      state: State,
+      state: storeState,
       g,
     }
   );
 
   return {
-    get state() {
-      return store.get();
-    },
-    subscribe: store.subscribe,
+    state: storeState,
     mutations,
     actions,
     getters,
