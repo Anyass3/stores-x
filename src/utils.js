@@ -1,4 +1,5 @@
-const getName = (prefix, str) => prefix + str.slice(0, 1).toUpperCase() + str.slice(1);
+const getName = (prefix, str) =>
+  prefix ? prefix + str.slice(0, 1).toUpperCase() + str.slice(1) : str;
 
 export const createDefaultGetters = (state, prefix = 'get', stores) => {
   let obj = {};
