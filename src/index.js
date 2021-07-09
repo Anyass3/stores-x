@@ -44,6 +44,9 @@ export default (mystores, prefix = {}) => {
   }, []);
   const noStore = mystores.reduce((arr, store) => {
     // gets all state items which should be static
+    if (store['noStore'] === true) {
+      store['noStore'] = Object.keys(store.state);
+    }
     return [...arr, ...(store['noStore'] ? store['noStore'] : [])];
   }, []);
 
