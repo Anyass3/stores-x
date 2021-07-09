@@ -43,5 +43,5 @@ export const sessionPersistantStore = (_key) => {
 
 export const localPersistantStore = (_key) => {
   const key = 'localStore-' + _key;
-  if (browser) return (value, start) => persistantStore(sessionStorage, key, value, start);
+  if (browser) return (value, start) => persistantStore(localStorage, key, value, start);
 };

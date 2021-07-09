@@ -1,6 +1,6 @@
 {
     "name": "stores-x",
-    "version": "0.0.84",
+    "version": "0.0.85",
     "description": "This is minimal vueX implementation.",
     "jsdelivr": "dist/index.min.js",
     "module": "dist/index.mjs",
