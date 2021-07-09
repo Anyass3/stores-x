@@ -1,6 +1,6 @@
 {
     "name": "stores-x",
-    "version": "0.0.82",
+    "version": "0.0.83",
     "description": "This is minimal vueX implementation.",
     "jsdelivr": "dist/index.min.js",
     "module": "dist/index.mjs",
@@ -31,6 +31,8 @@
         "@babel/polyfill": "^7.12.1",
         "@babel/preset-env": "^7.12.1",
         "@rollup/plugin-node-resolve": "^9.0.0",
+        "eslint": "^7.30.0",
+        "eslint-config-prettier": "^8.3.0",
         "rollup": "^2.0.0",
         "rollup-plugin-svelte": "^6.0.0",
         "svelte": "^3.0.0",
