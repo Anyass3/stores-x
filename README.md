@@ -218,7 +218,7 @@ console.log($isLoggedIn); // logs => true|false
 if you want you can give the defaults a prefix
 
 ```javascript
-store = storesX([store1, store2], { getter: 'get', mutation: 'set', action: 'set' });
+store = storesX([store1, store2], { getters: 'get', mutations: 'set', actions: 'set' });
 // so now
 apiKey = store.g('getApiKey');
 store.commit('setIsLoggedIn', val);
