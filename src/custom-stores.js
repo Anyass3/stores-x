@@ -32,8 +32,19 @@ export const persistantStore = (browserStorage, key, value, start) => {
     if (inBrowserStorage) browserStorage.setItem(key, JSON.stringify(val));
     _set(val);
   };
+  const update = (fn, inBrowserStorage = true) => {
+    let val = rest.get();
+    if (!val) {
+      try {
+        val = JSON.parse(browserStorage.getItem(key));
+      } catch (error) {
+        //
+      }
+    }
+    set(fn(val), inBrowserStorage);
+  };
 
-  return { ...rest, set };
+  return { ...rest, set, update };
 };
 
 export const sessionPersistantStore = (_key) => {
