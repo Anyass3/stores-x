@@ -23,7 +23,8 @@ export const writable = (value) => {
 
 export const persistantStore = (browserStorage, key, value, start) => {
   try {
-    value = JSON.parse(browserStorage.getItem(key));
+    const _val = JSON.parse(browserStorage.getItem(key));
+    value = _val === null ? value : _val;
   } catch (error) {
     //
   }
