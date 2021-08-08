@@ -49,11 +49,15 @@ export const persistantStore = (browserStorage, key, value, start) => {
 };
 
 export const sessionPersistantStore = (_key) => {
-  const key = 'sessionStore-' + _key;
-  if (browser) return (value, start) => persistantStore(sessionStorage, key, value, start);
+  if (browser) {
+    const key = `${window.location.host}::${_key}`;
+    return (value, start) => persistantStore(sessionStorage, key, value, start);
+  }
 };
 
 export const localPersistantStore = (_key) => {
-  const key = 'localStore-' + _key;
-  if (browser) return (value, start) => persistantStore(localStorage, key, value, start);
+  if (browser) {
+    const key = `${window.location.host}::${_key}`;
+    return (value, start) => persistantStore(localStorage, key, value, start);
+  }
 };
