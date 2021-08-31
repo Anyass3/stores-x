@@ -2,19 +2,15 @@
 
 This is inspired by [Vuex](https://github.com/vuejs/vuex)
 
-It's for now a minimal implementation of the vuex
+It has a api as vuex and uses the svelte store( or your own custom svelte store like) and makes working with svelte stores somewhat clean and organised
 
-It uses the svelte store( or your own custom svelte store)
-
-It makes working with svelte stores somewhat clean and organised
-
-Also the compiled version should be able to work in any other js web app(not tested yet)
+> The compiled version should be able to work in any other js web app(not tested yet)
 
 # installation
 
 `npm install stores-x`
 
-# Also you can try cdn
+# or try cdn
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/stores-x/dist/index.min.js"><script>
@@ -32,11 +28,9 @@ module
 <script src="https://cdn.jsdelivr.net/npm/stores-x/dist/index.min.mjs"><script>
 ```
 
-# Usage
+# Usage demo
 
 > [check out the svelte relp demo](https://svelte.dev/repl/3916c946d06e4289b28992ea625c5092?version=3.31.0)
-
-> it should be similar in other js frameworks(not tested yet)
 
 # API
 
