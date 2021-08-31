@@ -2,7 +2,7 @@
 
 This is inspired by [Vuex](https://github.com/vuejs/vuex)
 
-It has a api as vuex and uses the svelte store( or your own custom svelte store like) and makes working with svelte stores somewhat clean and organised
+It has a similar api as vuex and uses the svelte store( or your own custom svelte store like) and makes working with svelte stores somewhat clean and organised
 
 > The compiled version should be able to work in any other js web app(not tested yet)
 
