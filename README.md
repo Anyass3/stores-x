@@ -47,7 +47,11 @@ They mutate the state values. Simply put they change or set state values. The ar
 declared like This :
 
 ```javascript
-mutationName(state,...args){}
+mutations{
+  ...
+  mutationName(state,...args){}
+  ...
+ }
 ```
 
 run as
@@ -55,7 +59,7 @@ run as
 ```javascript
 commit('mutationName', val);
 or;
-mutationName(val);
+mutations.mutationName(val);
 ```
 
 ### store.actions
@@ -65,15 +69,19 @@ The do tasks like any other function. They can **commit** 'store.mutations' also
 declared like This :
 
 ```javascript
-actionName({state, commit, dispatch, g },...args){}
+actions{
+  actionName({state, commit, dispatch, g },...args){}
+ }
 ```
 
 run as
 
 ```javascript
 dispatch('actionName', ...args);
-or;
-actionName(...args);
+
+// or
+
+actions.actionName(...args);
 ```
 
 ### store.getters
@@ -83,7 +91,11 @@ They are used to get state values or any other custom one
 declared like This :
 
 ```javascript
-getterName(state,...args:Optional){}
+getters{
+  ...
+  getterName(state,...args:Optional){}
+  ...
+ }
 ```
 
 run as
@@ -91,30 +103,30 @@ run as
 ```javascript
 g('getterName');
 or;
-getterName();
+getters.getterName();
 ```
 
 ### store.noStore
 
-this an array of state items which you don't wish to be a **any store**. that is the item will have a static state. **It's a config**
+this an array of state items which you don't wish to be a **any store**. That is the item will be reactive. **It's a config**
 
 ### store.defaults
 
 This controls the default settings (ie. whether to disable the default getter or mutation for a particular state). **It's a config**
 
-> if the default mutation for a particular state item is disabled the corresponding default action will also be disabled.
+> If the default mutation for a particular state item is disabled the corresponding default action will also be disabled.
 
 `default: true`
-all items getters, mutations, actions will be created automatically. This is the default`
+All item's getters, mutations, actions will be created automatically. This is the default`
 
 or
 
-```js
+```javascript
 default: {
-  item1:true,//getters, mutations, actions will be created automatically
-  item2:{getters: false},// mutations, actions will be created automatically
-  item3:false// no default getters, mutations, actions will be created
-  }
+  item1: true, //getters, mutations, actions will be created automatically
+  item2: {getters: false}, //mutations, actions will be created automatically
+  item3: false //no default getters, mutations, actions will be created
+ }
 ```
 
 ### store.storeType
@@ -122,8 +134,16 @@ default: {
 **It's a config**
 this declares the type of store you want for an storeitem
 
-`storeType: 'writable' // all items will be writable. This is the default` or
-`storeType: {item1:'writable',item2:'sessionPersistantStore',item3:customStore} //an item's defaults to 'writable'`
+`storeType: 'writable' // all items will be writable. This is the default` 
+or
+```javascript
+storeType: {
+  item1: 'writable',
+  item2: 'sessionPersistantStore',
+  item3: customStore
+ } 
+  //each item defaults to 'writable'`
+```
 
 options:
 
@@ -197,10 +217,10 @@ store2 = {
   },
 };
 
-store = storesX([store1, store2]);
+const store = storesX([store1, store2]);
 
-apiKey = store.g('apiKey'); // apiKey is getter is created automatically by default
-isLoggedIn = store.g('isLoggedIn');
+const apiKey = store.g('apiKey'); // apiKey is getter is created automatically by default
+const isLoggedIn = store.g('isLoggedIn');
 
 console.log(apiKey); // logs => 'string'
 
