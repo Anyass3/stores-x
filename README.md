@@ -4,7 +4,9 @@ This is inspired by [Vuex](https://github.com/vuejs/vuex)
 
 It has a similar api as vuex and uses the svelte store( or your own custom svelte store like) and makes working with svelte stores somewhat clean and organised
 
-> The compiled version should be able to work in any other js web app(not tested yet)
+_The compiled version should be able to work in any other js web app(not tested yet)_
+
+> **current plan is to rewrite entire lib in typescript and add full typescript support.**
 
 # installation
 
