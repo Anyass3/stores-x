@@ -1,4 +1,4 @@
-const getName = (prefix, str) =>
+const getName = <P extends string, S extends string>(prefix: P, str: S) =>
   prefix ? prefix + str.slice(0, 1).toUpperCase() + str.slice(1) : str;
 
 export const createDefaultGetters = (state, prefix = '', stores) => {
@@ -27,18 +27,27 @@ export const createDefaultActions = (state, prefix, stores) => {
   return obj;
 };
 
-export const getMutations = (_mutations, state) => {
-  let mutations;
+export const getMutations = <A, S>(
+  _mutations: Record<string, (state: S, ...args: A[]) => void>,
+  state
+) => {
+  let mutations: Record<string, (...args: A[]) => void>;
   for (let item in _mutations)
     mutations = { ...mutations, [item]: (...args) => _mutations[item](state, ...args) };
   return mutations;
 };
 
-export const getActions = (_actions, actionObj) => {
-  let actions;
-  for (let action in _actions)
-    actions = { ...actions, [action]: (...args) => _actions[action](actionObj, ...args) };
-  return { actions: actions, dispatch: actionObj['dispatch'], commit: actionObj['commit'] };
+export const getActions = <A, S, B extends Record<string, (actionObj: S, ...args: A[]) => any>>(
+  _actions: B,
+  actionObj: S
+) => {
+  let actions = {} as Record<keyof B, InlineMethod<ValueOf<B>>>;
+  let action: keyof B;
+  for (action in _actions) {
+    const _action = (...args: A[]): ReturnType<ValueOf<B>> => _actions[action](actionObj, ...args);
+    actions = { ...actions, [action]: _action };
+  }
+  return actions;
 };
 
 export const getGetters = (_getters, state) => {

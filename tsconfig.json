@@ -1,0 +1,25 @@
+{
+  "include": ["*", "src/types"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "target": "es2019",
+    "importsNotUsedAsValues": "error",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declarationDir": ".",
+    "allowJs": true,
+    "checkJs": true,
+    /* Emit */
+    "declaration": true,
+    // "emitDeclarationOnly": true,
+    // "outFile": "./",
+    "outDir": "dist"
+  }
+}

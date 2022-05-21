@@ -7,16 +7,66 @@ import {
   getGetters,
   getMutations,
   getActions,
-  Dispatcher,
-  // DispatcherArgs,
 } from './utils';
 
-export default (mystores, prefix = {}) => {
-  const stores = (value) =>
-    mystores.reduce((arr, store) => {
-      return { ...arr, ...store[value] };
-    }, {});
-  let storeState = stores('state');
+const spread = (a = '', b = 0, c = 'list') => {
+  return b;
+};
+const test: InlineMethod<typeof spread> = (b, c) => {
+  return b;
+};
+test(1, '');
+
+declare type dispatcherArgs<
+  S,
+  G extends Record<keyof any, (...args) => any>,
+  M extends Record<keyof any, (...args) => any>,
+  A extends Record<keyof any, (...args) => any>
+> = {
+  state: S;
+  g: (getter: keyof G, ...args: ExcludeFirstParameter<ValueOf<M>>) => any;
+  commit: (mutation: keyof M, ...args: ExcludeFirstParameter<ValueOf<M>>) => any;
+  dispatch: (
+    action: keyof A,
+    ...args: ExcludeFirstParameter<ValueOf<A>>
+  ) => Promise<ReturnType<ValueOf<A>>>;
+};
+
+const StoreX = <
+  Default extends Defaults,
+  NoStore extends boolean | string[],
+  State extends Record<string, any>,
+  Getters extends Record<string, (state: State, ...args) => any>,
+  Mutations extends Record<string, (state: State, ...args) => any>,
+  Actions extends Record<
+    string,
+    (opts: dispatcherArgs<State, Getters, Mutations, Actions>, ...args) => any
+  >,
+  P extends string
+>(
+  mystores: {
+    defaults?: Default;
+    noStore?: NoStore;
+    state?: State;
+    getters?: Getters;
+    mutations?: Mutations;
+    actions?: Actions;
+  }[],
+  prefix?: Prefix<P>
+) => {
+  const storeState = mystores.reduce((arr, store) => {
+    return { ...arr, ...store['state'] };
+  }, {} as State);
+  const storeGetters = mystores.reduce((arr, store) => {
+    return { ...arr, ...store['getters'] };
+  }, {} as Getters);
+  const storeMutations = mystores.reduce((arr, store) => {
+    return { ...arr, ...store['mutations'] };
+  }, {} as Mutations);
+  const storeActions = mystores.reduce((arr, store) => {
+    return { ...arr, ...store['actions'] };
+  }, {} as Actions);
+
   const getStoreType = (_storeType, item) => {
     // gets state items store type
     if (typeof _storeType === 'string') {
@@ -59,26 +109,25 @@ export default (mystores, prefix = {}) => {
 
   const mutations = {
     ...createDefaultMutations(storeState, prefix.mutations, mystores, noStore),
-    ...getMutations(stores('mutations'), storeState),
+    ...getMutations(storeMutations, storeState),
   };
 
   const getters = {
     ...createDefaultGetters(storeState, prefix.getters, mystores),
-    ...getGetters(stores('getters'), storeState),
+    ...getGetters(storeGetters, storeState),
   };
 
   const _actions = {
     ...createDefaultActions(storeState, prefix, mystores),
-    ...stores('actions'),
+    ...storeActions,
   };
 
   const g = (getter, ...args) => getters[getter](...args); //gets getters
   const commit = (mutation, ...args) => mutations[mutation](...args);
 
-  function dispatch(action, ...args) {
-    return new Promise((resolve, reject) => {
+  const dispatch = (action: keyof typeof _actions | ValueOf<typeof _actions>, ...args) => {
+    return new Promise((resolve: (value: ReturnType<ValueOf<typeof _actions>>) => void, reject) => {
       try {
-        // console.log('dispatch-args', args);
         let result =
           typeof action === 'function'
             ? action(dispatcherArgs, ...args)
@@ -88,9 +137,9 @@ export default (mystores, prefix = {}) => {
         reject(err);
       }
     });
-  }
+  };
   const dispatcherArgs = { state: storeState, g, commit, dispatch };
-  const { actions } = getActions(_actions, dispatcherArgs);
+  const actions = getActions(_actions, dispatcherArgs);
 
   return {
     mutations,
@@ -99,3 +148,28 @@ export default (mystores, prefix = {}) => {
     ...dispatcherArgs,
   };
 };
+
+const store = StoreX([
+  {
+    state: {
+      hi: 2,
+    },
+    mutations: {
+      mu({}) {
+        return 2;
+      },
+    },
+    actions: {
+      fn({ state }, a: string) {
+        return state.hi;
+      },
+      x({}, hi) {
+        return 5;
+      },
+    },
+  },
+]);
+
+store.actions.fn;
+let p = store.dispatch('fn', 2);
+store.dispatch('fn', '');
